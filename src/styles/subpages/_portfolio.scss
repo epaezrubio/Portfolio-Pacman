@@ -1,0 +1,139 @@
+.subpage--portfolio {
+  b {
+    color: lighten($ghost-pink, 2.5%);
+  }
+
+  &__logos-map-wrapper {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  &__logos-map {
+    max-width: 100%;
+  }
+
+  &__gallery {
+    padding-bottom: 4rem;
+  }
+
+  &__gallery-navigation {
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 3rem;
+    flex-wrap: wrap;
+    display: none;
+    overflow: visible;
+
+    @include media-responsive() {
+      display: flex;
+    }
+  }
+
+  &__gallery-thumbnail {
+    height: 5rem;
+    width: 5rem;
+    transform: scale(1.25);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: grayscale(0%);
+    transition: all 300ms ease;
+    z-index: 1;
+
+    &:not(.swiper-pagination-bullet-active) {
+      cursor: pointer;
+      filter: grayscale(80%);
+      opacity: 0.5;
+      transform: scale(1);
+      display: block;
+
+      &:hover {
+        filter: grayscale(0%);
+        opacity: 0.75;
+      }
+    }
+  }
+
+  &__gallery-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    align-items: center;
+
+    @include media-responsive() {
+      flex-direction: row;
+      align-items: flex-start;
+    }
+  }
+
+  &__gallery-item-image {
+    @include media-responsive() {
+      flex: 0 0 25%;
+    }
+
+    img {
+      width: 100%;
+      max-height: 20rem;
+
+      @include media-responsive() {
+        width: 100%;
+        max-height: none;
+        height: auto;
+      }
+    }
+  }
+
+  &__gallery-item-description {
+    flex: 1;
+  }
+
+  &__gallery-item-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  &__gallery-item-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  &__gallery-item-pill {
+    font-size: 0.75rem;
+    padding: 0.5rem;
+    background-color: $ghost-pink;
+    color: #000000;
+  }
+
+  &__gallery-item-links {
+    line-height: 1.75rem;
+  }
+
+  &__gallery-arrows {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 2rem;
+
+    @include media-responsive() {
+      display: none;
+    }
+
+    img {
+      width: 2rem;
+      height: 2rem;
+    }
+  }
+
+  &__gallery-arrow--left {
+    @extend %animate-move-left;
+  }
+
+  &__gallery-arrow--right {
+    @extend %animate-move-right;
+  }
+}

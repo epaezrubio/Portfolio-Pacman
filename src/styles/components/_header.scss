@@ -1,0 +1,28 @@
+.header {
+  grid-area: header;
+  text-align: center;
+  padding-bottom: 2vh;
+
+  h1, h2 {
+    padding: 0 2rem;
+    line-height: clamp(2rem, 1vw, 3rem);
+  }
+
+  h1 {
+    font-size: clamp(1rem, 2.5vw, 2rem);
+  }
+
+  h2 {
+    font-size: clamp(0.8rem, 1.5vw, 1.25rem);
+  }
+}
+
+.employer-link {
+  color: #f5842d;
+  padding-bottom: 5px;
+  border-bottom: 2px solid transparent;
+
+  &:hover, &:active, &:focus {
+    border-bottom-color: #f5842d;
+  }
+}
