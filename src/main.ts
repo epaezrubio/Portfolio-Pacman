@@ -58,7 +58,7 @@ function initState(): void {
     state.game,
     'npc3',
     NpcEntityColor.blue,
-    '/cv',
+    '/resume',
   );
 
   randomizeEntityPosition(state, npcEntity1);
