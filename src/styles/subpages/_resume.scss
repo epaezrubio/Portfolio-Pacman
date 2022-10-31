@@ -24,6 +24,23 @@
     }
   }
 
+  &__resume-links {
+    padding: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__resume-links-separator {
+    display: none;
+
+    @include media-responsive() {
+      display: block;
+    }
+  }
+
   &__resume-link {
     padding: 1rem;
   }
