@@ -6,9 +6,7 @@ import type {
 } from '../../shared/state/game/types';
 import { NpcEntityColor } from '../../shared/state/game/types';
 import type { ApplicationInjects } from '../../types';
-import { AboutSubpage } from '../subpages/AboutSubpage';
 import type { BaseSubpage } from '../subpages/BaseSubpage';
-import { PortfolioSubpage } from '../subpages/PortfolioSubpage';
 
 export class ContentHandler {
   private static readonly fillMap: Record<NpcEntityColor, string> = {
@@ -23,8 +21,7 @@ export class ContentHandler {
     string,
     new (page: HTMLDivElement) => BaseSubpage
   > = {
-    '/portfolio': PortfolioSubpage,
-    '/about': AboutSubpage,
+    // Example: '/portfolio': PortfolioSubpage,
   };
   /* eslint-enable @typescript-eslint/naming-convention */
 

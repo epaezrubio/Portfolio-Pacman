@@ -15,50 +15,6 @@
   animation-timing-function: steps(1, start);
 }
 
-$arrows-move-first: 2.5px;
-$arrows-move-second: 5px;
-
-@keyframes move-right {
-  0% {
-    transform: translateX(0);
-  }
-  33% {
-    transform: translateX($arrows-move-first);
-  }
-  66% {
-    transform: translateX($arrows-move-second);
-  }
-  100% {
-    transform: translateX(0);
-  }
-}
-
-%animate-move-right {
-  transform: translateX(0) rotate(180deg);
-  animation: move-right 600ms infinite;
-  animation-timing-function: steps(1, start);
-}
-
-@keyframes move-left {
-  0% {
-    transform: translateX(0) rotate(180deg);
-  }
-  33% {
-    transform: translateX(-$arrows-move-first) rotate(180deg);
-  }
-  66% {
-    transform: translateX(-$arrows-move-second) rotate(180deg);
-  }
-  100% {
-    transform: translateX(0) rotate(180deg);
-  }
-}
-
-%animate-move-left {
-  animation: move-left 600ms infinite;
-  animation-timing-function: steps(1, start);
-}
-
 @keyframes rainbow {
   0% { color: #ff0000; }
   14% { color: #ffa500; }
