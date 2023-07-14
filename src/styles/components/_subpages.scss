@@ -68,6 +68,10 @@
       margin-bottom: 0;
     }
 
+    > h3 {
+      font-size: 1.3rem;
+    }
+
     &--cols {
       @include media-responsive() {
         display: flex;
