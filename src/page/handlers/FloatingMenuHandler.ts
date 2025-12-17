@@ -20,16 +20,26 @@ export class FloatingMenuHandler {
 
   private isVisibile = false;
 
-  constructor(injects: ApplicationInjects) {
+  constructor(injects: ApplicationInjects, navigate: (target: string) => void) {
     this.injects = injects;
 
-    /* eslint-disable @typescript-eslint/no-non-null-assertion */
-    this.toggleButton = document.querySelector('#menu-toggle-button')!;
-    this.menu = document.querySelector('#floating-menu')!;
-    this.links = this.menu.querySelectorAll('a');
-    this.employerLink = document.querySelector('#employer-link')!;
+    const toggleButton = document.querySelector<HTMLLinkElement>(
+      '#menu-toggle-button',
+    );
+    const menu = document.querySelector<HTMLDivElement>('#floating-menu');
+    const employerLink =
+      document.querySelector<HTMLAnchorElement>('#employer-link');
 
-    this.linksHandler = new LinksHandler(injects, this.links);
+    if (!toggleButton || !menu || !employerLink) {
+      throw new Error('FloatingMenuHandler: Required DOM elements not found.');
+    }
+
+    this.toggleButton = toggleButton;
+    this.menu = menu;
+    this.links = this.menu.querySelectorAll('a');
+    this.employerLink = employerLink;
+
+    this.linksHandler = new LinksHandler(injects, this.links, navigate);
 
     effect(() => {
       unusedTrack(this.injects.state.route.currentRoute);

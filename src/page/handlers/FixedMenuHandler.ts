@@ -9,12 +9,19 @@ export class FixedMenuHandler {
 
   private readonly linksHandler: LinksHandler;
 
-  constructor(injects: ApplicationInjects) {
-    /* eslint-disable @typescript-eslint/no-non-null-assertion */
-    this.menu = document.querySelector('#fixed-menu')!;
+  constructor(injects: ApplicationInjects, navigate: (target: string) => void) {
+    const menu = document.querySelector<HTMLDivElement>('#fixed-menu');
+
+    if (!menu) {
+      throw new Error(
+        'FixedMenuHandler: Required DOM element #fixed-menu not found.',
+      );
+    }
+
+    this.menu = menu;
     this.links = this.menu.querySelectorAll('a');
 
-    this.linksHandler = new LinksHandler(injects, this.links);
+    this.linksHandler = new LinksHandler(injects, this.links, navigate);
   }
 
   public addMenuEventHandlers(): void {

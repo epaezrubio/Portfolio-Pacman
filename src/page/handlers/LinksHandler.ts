@@ -5,22 +5,30 @@ export class LinksHandler {
 
   private readonly links: NodeListOf<HTMLAnchorElement>;
 
+  private readonly navigate: (target: string) => void;
+
   constructor(
     injects: ApplicationInjects,
     links: NodeListOf<HTMLAnchorElement>,
+    navigate?: (target: string) => void,
   ) {
     this.injects = injects;
     this.links = links;
+    this.navigate =
+      navigate ?? ((target: string) => this.injects.router.navigate(target));
   }
 
   public addEventHandlers(): void {
     this.links.forEach((link) => {
       link.addEventListener('click', (event: MouseEvent) => {
+        const target = link.getAttribute('href');
+
+        if (!target) {
+          return;
+        }
+
         event.preventDefault();
-
-        this.followLink(link);
-
-        return false;
+        this.navigate(target);
       });
     });
   }
@@ -35,15 +43,5 @@ export class LinksHandler {
     this.links.forEach((link) => {
       link.setAttribute('tabindex', '-1');
     });
-  }
-
-  private followLink(link: HTMLAnchorElement): void {
-    const target = link.getAttribute('href');
-
-    if (target === null) {
-      return;
-    }
-
-    this.injects.router.navigate(target);
   }
 }

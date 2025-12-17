@@ -16,4 +16,6 @@ export const config: GameConfig = {
     { x: 13, y: 12 },
     { x: 14, y: 12 },
   ],
+  ghostDirectionChangeLikelihood: 5,
+  deltaTimeDivisor: 60,
 };

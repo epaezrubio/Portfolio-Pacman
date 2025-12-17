@@ -1,7 +1,7 @@
 import './styles/style.scss';
 
+import 'swiped-events';
 import { effect } from '@vue/reactivity';
-import { initSwipe } from 'swipe-mobile';
 
 import { init as initCanvas } from './canvas';
 import { config } from './config';
@@ -56,7 +56,7 @@ function initState(): void {
   );
   const npcEntity4 = registerNpc(
     state.game,
-    'npc3',
+    'npc4',
     NpcEntityColor.blue,
     '/resume',
   );
@@ -117,37 +117,19 @@ function initSwipeEvents(): void {
     '#canvas-app > canvas',
   )!;
 
-  const { top, left, right, bottom } = initSwipe(canvas);
-
-  top((event) => {
-    if (event.distance < 10) {
-      return;
-    }
-
+  document.addEventListener('swiped-up', (event) => {
     setPlayerDirection(state.game, Direction.up);
   });
 
-  right((event) => {
-    if (event.distance < 10) {
-      return;
-    }
-
+  document.addEventListener('swiped-right', (event) => {
     setPlayerDirection(state.game, Direction.right);
   });
 
-  bottom((event) => {
-    if (event.distance < 10) {
-      return;
-    }
-
+  document.addEventListener('swiped-down', (event) => {
     setPlayerDirection(state.game, Direction.down);
   });
 
-  left((event) => {
-    if (event.distance < 10) {
-      return;
-    }
-
+  document.addEventListener('swiped-left', (event) => {
     setPlayerDirection(state.game, Direction.left);
   });
 }
@@ -162,7 +144,7 @@ function init(): void {
 
   initSwipeEvents();
 
-  ticker.add(() => {
+  ticker.add((deltaTime: number) => {
     if (state.gameLoop.paused) {
       return;
     }
@@ -174,7 +156,7 @@ function init(): void {
       return;
     }
 
-    tickApplication(state);
+    tickApplication(state, deltaTime);
   });
 }
 

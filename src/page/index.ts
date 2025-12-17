@@ -15,63 +15,110 @@ import { FloatingMenuHandler } from './handlers/FloatingMenuHandler';
 export function init(injects: ApplicationInjects): void {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const employerLink = document.querySelector('#employer-link')!;
-  const contentHandler = new ContentHandler(injects);
-  const floatingMenuHandler = new FloatingMenuHandler(injects);
-  const fixedMenuHandler = new FixedMenuHandler(injects);
+  let contentHandler: ContentHandler;
+
+  function normalizePath(path: string): string {
+    // Remove trailing slash for consistent matching (but keep "/" as is)
+    if (path.length > 1 && path.endsWith('/')) {
+      return path.slice(0, -1);
+    }
+    return path;
+  }
+
+  let currentRoute = normalizePath(window.location.pathname);
+  let navigating = false;
+
+  async function navigateWithTransition(
+    target: string,
+    pushState = true,
+  ): Promise<void> {
+    const normalizedTarget = normalizePath(target);
+    if (!normalizedTarget || normalizedTarget === currentRoute || navigating) {
+      return;
+    }
+
+    navigating = true;
+
+    try {
+      const payload = contentHandler?.getTransitionPayload(normalizedTarget);
+
+      if (payload) {
+        sessionStorage.setItem('navTransition', JSON.stringify(payload));
+      }
+
+      await contentHandler.navigateTo(normalizedTarget);
+
+      if (pushState) {
+        window.history.pushState({}, '', normalizedTarget);
+      }
+
+      currentRoute = normalizedTarget;
+      setCurrentRoute(injects.state.route, normalizedTarget);
+      applyRouteSideEffects(normalizedTarget);
+    } finally {
+      navigating = false;
+    }
+  }
+
+  contentHandler = new ContentHandler(injects, navigateWithTransition);
+  const floatingMenuHandler = new FloatingMenuHandler(
+    injects,
+    navigateWithTransition,
+  );
+  const fixedMenuHandler = new FixedMenuHandler(
+    injects,
+    navigateWithTransition,
+  );
 
   floatingMenuHandler.addMenuEventHandlers();
   fixedMenuHandler.addMenuEventHandlers();
   contentHandler.addEventHandlers();
 
-  injects.router.hooks({
-    before: (next, match) => {
-      setCurrentRoute(injects.state.route, match.url);
+  setCurrentRoute(injects.state.route, normalizePath(window.location.pathname));
+  applyRouteSideEffects(normalizePath(window.location.pathname));
 
-      if (match.url === '/' || match.url === '') {
-        employerLink.setAttribute('tabindex', '0');
-        floatingMenuHandler.enableLinks();
-        fixedMenuHandler.enableLinks();
+  contentHandler.initialTransition();
+  contentHandler.initialControllerShow();
 
-        resumeGameLoop(injects.state.gameLoop);
+  injects.router.setNavigate(navigateWithTransition);
 
-        if (injects.state.game.player.collision) {
-          setNpcState(injects.state.game.player.collision, NpcState.respawning);
+  window.addEventListener('popstate', () => {
+    navigateWithTransition(window.location.pathname, false);
+  });
 
-          const respawnXOffset = Math.random() >= 0.5 ? -0.5 : 0.5;
+  function applyRouteSideEffects(path: string): void {
+    const normalizedPath = normalizePath(path);
+    if (normalizedPath === '/' || normalizedPath === '') {
+      employerLink.setAttribute('tabindex', '0');
+      floatingMenuHandler.enableLinks();
+      fixedMenuHandler.enableLinks();
 
-          setEntityPosition(
-            injects.state.game.player.collision,
-            (config.respawnLocation.x + respawnXOffset) *
-              injects.state.grid.cellSize,
-            config.respawnLocation.y * injects.state.grid.cellSize,
-          );
+      resumeGameLoop(injects.state.gameLoop);
 
-          injects.state.game.player.collision = null;
-        }
+      if (injects.state.game.player.collision) {
+        setNpcState(injects.state.game.player.collision, NpcState.respawning);
 
-        document.body.classList.add('has-menu-toggle');
-      } else {
-        employerLink.setAttribute('tabindex', '-1');
-        floatingMenuHandler.disableLinks();
-        fixedMenuHandler.disableLinks();
+        const respawnXOffset = Math.random() >= 0.5 ? -0.5 : 0.5;
 
-        pauseGameLoop(injects.state.gameLoop);
+        setEntityPosition(
+          injects.state.game.player.collision,
+          (config.respawnLocation.x + respawnXOffset) *
+            injects.state.grid.cellSize,
+          config.respawnLocation.y * injects.state.grid.cellSize,
+        );
 
-        document.body.classList.remove('has-menu-toggle');
+        injects.state.game.player.collision = null;
       }
 
-      next();
-    },
-  });
+      document.body.classList.add('has-menu-toggle');
+    } else {
+      employerLink.setAttribute('tabindex', '-1');
+      floatingMenuHandler.disableLinks();
+      fixedMenuHandler.disableLinks();
 
-  injects.router.on('/', () => {
-    contentHandler.transitionPage(null);
-  });
+      pauseGameLoop(injects.state.gameLoop);
 
-  contentHandler.addRouteHandlers();
-  contentHandler.initialTransition();
-
-  injects.router.resolve();
-
-  contentHandler.initialControllerShow();
+      document.body.classList.remove('has-menu-toggle');
+    }
+  }
 }

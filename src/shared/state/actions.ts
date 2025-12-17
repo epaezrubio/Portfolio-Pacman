@@ -153,31 +153,40 @@ function tickNextDirection(
 function getNextPosition(
   state: ApplicationState,
   entityState: EntityState,
+  deltaTime: number,
 ): IPointData {
   const movement = directionMovement[entityState.direction];
+  const delta = deltaTime || 1;
 
   return {
     x:
       entityState.x +
-      movement.x * entityState.speed * (state.grid.cellSize / 60),
+      movement.x *
+        entityState.speed *
+        (state.grid.cellSize / config.deltaTimeDivisor) *
+        delta,
     y:
       entityState.y +
-      movement.y * entityState.speed * (state.grid.cellSize / 60),
+      movement.y *
+        entityState.speed *
+        (state.grid.cellSize / config.deltaTimeDivisor) *
+        delta,
   };
 }
 
 export function tickEntityMovement(
   state: ApplicationState,
   entityState: EntityState,
+  deltaTime: number,
 ): void {
   const originalDirection = entityState.direction;
 
-  let newPosition = getNextPosition(state, entityState);
+  let newPosition = getNextPosition(state, entityState, deltaTime);
 
   tickNextDirection(state, entityState, newPosition);
 
   if (originalDirection !== entityState.direction) {
-    newPosition = getNextPosition(state, entityState);
+    newPosition = getNextPosition(state, entityState, deltaTime);
   }
 
   if (
@@ -218,7 +227,7 @@ function tickNpcState(state: ApplicationState, npc: NpcEntityState): void {
   }
 }
 
-function tickNpcEntities(state: ApplicationState): void {
+function tickNpcEntities(state: ApplicationState, deltaTime: number): void {
   const npcs = state.game.npc;
 
   for (const npc of npcs) {
@@ -238,7 +247,7 @@ function tickNpcEntities(state: ApplicationState): void {
           npcCoordinates.y,
           Direction.right,
         ) &&
-        random.bool({ likelihood: 5 })
+        random.bool({ likelihood: config.ghostDirectionChangeLikelihood })
       ) {
         setEntityDirection(npc, Direction.right);
       } else if (
@@ -249,7 +258,7 @@ function tickNpcEntities(state: ApplicationState): void {
           npcCoordinates.y,
           Direction.left,
         ) &&
-        random.bool({ likelihood: 5 })
+        random.bool({ likelihood: config.ghostDirectionChangeLikelihood })
       ) {
         setEntityDirection(npc, Direction.left);
       } else if (
@@ -260,7 +269,7 @@ function tickNpcEntities(state: ApplicationState): void {
           npcCoordinates.y,
           Direction.up,
         ) &&
-        random.bool({ likelihood: 5 })
+        random.bool({ likelihood: config.ghostDirectionChangeLikelihood })
       ) {
         setEntityDirection(npc, Direction.up);
       } else if (
@@ -271,13 +280,13 @@ function tickNpcEntities(state: ApplicationState): void {
           npcCoordinates.y,
           Direction.down,
         ) &&
-        random.bool({ likelihood: 5 })
+        random.bool({ likelihood: config.ghostDirectionChangeLikelihood })
       ) {
         setEntityDirection(npc, Direction.down);
       }
     }
 
-    tickEntityMovement(state, npc);
+    tickEntityMovement(state, npc, deltaTime);
   }
 }
 
@@ -344,9 +353,12 @@ function tickPlayerPicks(state: ApplicationState): void {
   }
 }
 
-export function tickApplication(state: ApplicationState): void {
-  tickEntityMovement(state, state.game.player);
-  tickNpcEntities(state);
+export function tickApplication(
+  state: ApplicationState,
+  deltaTime: number,
+): void {
+  tickEntityMovement(state, state.game.player, deltaTime);
+  tickNpcEntities(state, deltaTime);
   tickPlayerPicks(state);
   tickPlayerCollisions(state.game);
 }
